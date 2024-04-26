@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>wirtefunction!</title>
+    <style>
+        body{
+            background-color: #62add6;
+        }
+        #margin {
+            margin-left: 12px;
+            margin-bottom: 20px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            user-select: none;
+        }
+
+        #myTextarea {
+            width: 500px;
+            overflow: hidden;
+            background-color: #FFF;
+            color: #222;
+            font-family: Courier, monospace;
+            font-weight: normal;
+            font-size: 24px;
+            resize: none;
+            line-height: 40px;
+            padding-left: 100px;
+            padding-right: 100px;
+            padding-top: 45px;
+            padding-bottom: 34px;
+            background-image: url(https://static.tumblr.com/maopbtg/E9Bmgtoht/lines.png), url(https://static.tumblr.com/maopbtg/nBUmgtogx/paper.png);
+            background-repeat: repeat-y, repeat;
+            -webkit-border-radius: 12px;
+            border-radius: 12px;
+            -webkit-box-shadow: 0px 2px 14px #000;
+            box-shadow: 0px 2px 14px #000;
+            border-top: 1px solid #FFF;
+            border-bottom: 1px solid #FFF;
+        }
+
+        #title {
+            background-color: transparent;
+            border-bottom: 3px solid #FFF;
+            color: #FFF;
+            font-size: 20px;
+            font-family: Courier, monospace;
+            height: 28px;
+            font-weight: bold;
+            width: 220px;
+        }
+
+        #button {
+            cursor: pointer;
+            margin-top: 20px;
+            float: right;
+            height: 40px;
+            padding-left: 24px;
+            padding-right: 24px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bold;
+            font-size: 20px;
+            color: #FFF;
+            -webkit-border-radius: 8px;
+            border-radius: 8px;
+            border-top: 1px solid #FFF;
+            -webkit-box-shadow: 0px 2px 14px #000;
+            box-shadow: 0px 2px 14px #000;
+            background-color: #62add6;
+            background-image: url(https://static.tumblr.com/maopbtg/ZHLmgtok7/button.png);
+            background-repeat: repeat-x;
+        }
+
+        #button:active {
+            zoom: 1;
+            filter: alpha(opacity=80);
+            opacity: 0.8;
+        }
+
+        #button:focus {
+            zoom: 1;
+            filter: alpha(opacity=80);
+            opacity: 0.8;
+        }
+
+        #wrapper {
+            width: 700px;
+            height: auto;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 24px;
+            margin-bottom: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper">
+        <form id="paper" method="get" action="">
+            <div id="margin">Title: <input id="titleInput" type="text" name="title" placeholder="Enter Username"></div>
+            <textarea placeholder="Enter something funny." id="myTextarea" name="myTextarea" rows="4"
+                style="overflow: hidden; word-wrap: break-word; resize: none; height: 160px; "></textarea>
+            <br>
+            <input id="button" type="submit" value="Create">
+            <br><br><br>
+        </form>
+        <div class="saves" id="hiddenSaves"></div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const paperForm = document.getElementById('paper');
+            paperForm.addEventListener('submit', handleSubmit);
+            loadSaves();
+        });
+        
+        function handleSubmit(event) {
+            event.preventDefault();
+            const text = document.getElementById("myTextarea").value;
+            const title = document.getElementById("titleInput").value;
+            const timestamp = new Date().toLocaleString();
+        
+            if (text === "" || title === "" ) {
+                alert("Please enter both title and text before saving.");
+                return;
+            }
+        
+            if (typeof (Storage) !== "undefined") {
+                const saves = JSON.parse(localStorage.getItem("saves")) || [];
+        
+                saves.push({
+                    timestamp: timestamp,
+                    title: title,
+                    text: text,
+                });
+        
+                localStorage.setItem("saves", JSON.stringify(saves));
+        
+                displaySave({
+                    timestamp: timestamp,
+                    title: title,
+                    text: text,
+                });
+            } else {
+                alert("Sorry, your browser does not support web storage...");
+            }
+        }
+        
+        function loadSaves() {
+            if (localStorage.getItem("saves")) {
+                const saves = JSON.parse(localStorage.getItem("saves"));
+        
+                saves.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+                saves.forEach(function (save) {
+                    displaySave(save);
+                });
+            }
+        }
+        
+        function displaySave(save) {
+            // Create a new div element to display the save 
+            const saveDiv = document.createElement('div');
+            saveDiv.classList.add('save');
+        
+            // Create elements for timestamp, title, text, and delete button
+            const timestampPara = document.createElement('h1');
+            timestampPara.textContent = "Timestamp: " + save.timestamp;
+        
+            const titlePara = document.createElement('p');
+            titlePara.textContent = "Title: " + save.title;
+        
+            const textPara = document.createElement('p');
+            textPara.textContent = "Text: " + save.text;
+        
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = "Delete";
+            deleteButton.addEventListener('click', function () {
+                removeSave(save);
+                saveDiv.remove();
+            });
+        
+            // Append elements to the save div
+            saveDiv.appendChild(timestampPara);
+            saveDiv.appendChild(titlePara);
+            saveDiv.appendChild(textPara);
+            saveDiv.appendChild(deleteButton);
+        
+            // Get the container element for saves
+            const savesContainer = document.getElementById('hiddenSaves');
+        
+            // Prepend the save div to the .saves container
+            savesContainer.insertBefore(saveDiv, savesContainer.firstChild);
+        }
+        
+        function removeSave(save) {
+            if (localStorage.getItem("saves")) {
+                const saves = JSON.parse(localStorage.getItem("saves"));
+        
+                // Find the index of the save to be removed
+                const index = saves.findIndex(function (item) {
+                    return item.timestamp === save.timestamp && item.text === save.text;
+                });
+        
+                if (index !== -1) {
+                    // Remove the save from the array
+                    saves.splice(index, 1);
+                    // Update local storage
+                    localStorage.setItem("saves", JSON.stringify(saves));
+                }
+            }
+        }
+        
+    </script>
+</body>
+
+</html>
