@@ -6,94 +6,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>wirtefunction!</title>
     <style>
-        body{
+        body {
             background-color: #62add6;
+            font-family: Arial, sans-serif;
         }
-        #margin {
-            margin-left: 12px;
+
+        #wrapper {
+            width: 90%;
+            margin: 0 auto;
+            padding-top: 20px;
+        }
+
+        #paper {
+            background-color: #FFF;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #titleInput {
+            width: calc(100% - 24px);
             margin-bottom: 20px;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            -o-user-select: none;
-            user-select: none;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
         }
 
         #myTextarea {
-            width: 500px;
-            overflow: hidden;
-            background-color: #FFF;
-            color: #222;
-            font-family: Courier, monospace;
-            font-weight: normal;
-            font-size: 24px;
+            width: calc(100% - 24px);
+            height: 160px;
+            margin-bottom: 20px;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
             resize: none;
-            line-height: 40px;
-            padding-left: 100px;
-            padding-right: 100px;
-            padding-top: 45px;
-            padding-bottom: 34px;
-            background-image: url(https://static.tumblr.com/maopbtg/E9Bmgtoht/lines.png), url(https://static.tumblr.com/maopbtg/nBUmgtogx/paper.png);
-            background-repeat: repeat-y, repeat;
-            -webkit-border-radius: 12px;
-            border-radius: 12px;
-            -webkit-box-shadow: 0px 2px 14px #000;
-            box-shadow: 0px 2px 14px #000;
-            border-top: 1px solid #FFF;
-            border-bottom: 1px solid #FFF;
-        }
-
-        #title {
-            background-color: transparent;
-            border-bottom: 3px solid #FFF;
-            color: #FFF;
-            font-size: 20px;
-            font-family: Courier, monospace;
-            height: 28px;
-            font-weight: bold;
-            width: 220px;
         }
 
         #button {
             cursor: pointer;
-            margin-top: 20px;
-            float: right;
+            display: block;
+            width: 100%;
             height: 40px;
-            padding-left: 24px;
-            padding-right: 24px;
-            font-family: Arial, Helvetica, sans-serif;
+            margin-top: 20px;
+            padding: 0 12px;
+            font-size: 18px;
             font-weight: bold;
-            font-size: 20px;
             color: #FFF;
-            -webkit-border-radius: 8px;
-            border-radius: 8px;
-            border-top: 1px solid #FFF;
-            -webkit-box-shadow: 0px 2px 14px #000;
-            box-shadow: 0px 2px 14px #000;
             background-color: #62add6;
-            background-image: url(https://static.tumblr.com/maopbtg/ZHLmgtok7/button.png);
-            background-repeat: repeat-x;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        #button:active {
-            zoom: 1;
-            filter: alpha(opacity=80);
-            opacity: 0.8;
+        .save {
+            background-color: #FFF;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        #button:focus {
-            zoom: 1;
-            filter: alpha(opacity=80);
-            opacity: 0.8;
+        .save h1 {
+            font-size: 18px;
+            margin-bottom: 10px;
         }
 
-        #wrapper {
-            width: 700px;
-            height: auto;
-            margin-left: auto;
-            margin-right: auto;
-            margin-top: 24px;
-            margin-bottom: 100px;
+        .save p {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .delete-button {
+            cursor: pointer;
+            background-color: #ff4d4d;
+            color: #FFF;
+            border: none;
+            border-radius: 5px;
+            padding: 6px 12px;
+            font-size: 16px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -101,44 +96,44 @@
 <body>
     <div id="wrapper">
         <form id="paper" method="get" action="">
-            <div id="margin">Title: <input id="titleInput" type="text" name="title" placeholder="Enter Username"></div>
-            <textarea placeholder="Enter something funny." id="myTextarea" name="myTextarea" rows="4"
-                style="overflow: hidden; word-wrap: break-word; resize: none; height: 160px; "></textarea>
+            <div id="margin">Title: <input id="titleInput" type="text" name="title" placeholder="Enter Username">
+            </div>
+            <textarea placeholder="Enter something funny." id="myTextarea" name="myTextarea" rows="4"></textarea>
             <br>
             <input id="button" type="submit" value="Create">
-            <br><br><br>
         </form>
         <div class="saves" id="hiddenSaves"></div>
     </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const paperForm = document.getElementById('paper');
             paperForm.addEventListener('submit', handleSubmit);
             loadSaves();
         });
-        
+
         function handleSubmit(event) {
             event.preventDefault();
             const text = document.getElementById("myTextarea").value;
             const title = document.getElementById("titleInput").value;
             const timestamp = new Date().toLocaleString();
-        
-            if (text === "" || title === "" ) {
+
+            if (text === "" || title === "") {
                 alert("Please enter both title and text before saving.");
                 return;
             }
-        
+
             if (typeof (Storage) !== "undefined") {
                 const saves = JSON.parse(localStorage.getItem("saves")) || [];
-        
+
                 saves.push({
                     timestamp: timestamp,
                     title: title,
                     text: text,
                 });
-        
+
                 localStorage.setItem("saves", JSON.stringify(saves));
-        
+
                 displaySave({
                     timestamp: timestamp,
                     title: title,
@@ -148,63 +143,64 @@
                 alert("Sorry, your browser does not support web storage...");
             }
         }
-        
+
         function loadSaves() {
             if (localStorage.getItem("saves")) {
                 const saves = JSON.parse(localStorage.getItem("saves"));
-        
+
                 saves.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        
+
                 saves.forEach(function (save) {
                     displaySave(save);
                 });
             }
         }
-        
+
         function displaySave(save) {
             // Create a new div element to display the save 
             const saveDiv = document.createElement('div');
             saveDiv.classList.add('save');
-        
+
             // Create elements for timestamp, title, text, and delete button
             const timestampPara = document.createElement('h1');
             timestampPara.textContent = "Timestamp: " + save.timestamp;
-        
+
             const titlePara = document.createElement('p');
             titlePara.textContent = "Title: " + save.title;
-        
+
             const textPara = document.createElement('p');
             textPara.textContent = "Text: " + save.text;
-        
+
             const deleteButton = document.createElement('button');
             deleteButton.textContent = "Delete";
+            deleteButton.classList.add('delete-button');
             deleteButton.addEventListener('click', function () {
                 removeSave(save);
                 saveDiv.remove();
             });
-        
+
             // Append elements to the save div
             saveDiv.appendChild(timestampPara);
             saveDiv.appendChild(titlePara);
             saveDiv.appendChild(textPara);
             saveDiv.appendChild(deleteButton);
-        
+
             // Get the container element for saves
             const savesContainer = document.getElementById('hiddenSaves');
-        
+
             // Prepend the save div to the .saves container
             savesContainer.insertBefore(saveDiv, savesContainer.firstChild);
         }
-        
+
         function removeSave(save) {
             if (localStorage.getItem("saves")) {
                 const saves = JSON.parse(localStorage.getItem("saves"));
-        
+
                 // Find the index of the save to be removed
                 const index = saves.findIndex(function (item) {
                     return item.timestamp === save.timestamp && item.text === save.text;
                 });
-        
+
                 if (index !== -1) {
                     // Remove the save from the array
                     saves.splice(index, 1);
@@ -213,7 +209,6 @@
                 }
             }
         }
-        
     </script>
 </body>
 
