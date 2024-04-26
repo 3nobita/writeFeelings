@@ -24,7 +24,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        #titleInput {
+        #usernameInput {
             width: calc(100% - 24px);
             margin-bottom: 20px;
             padding: 8px;
@@ -95,8 +95,8 @@
 
 <body>
     <div id="wrapper">
-        <form id="paper" method="get" action="">
-            <div id="margin">Title: <input id="titleInput" type="text" name="title" placeholder="Enter Username">
+        <form id="paper" onsubmit="return handleSubmit()">
+            <div id="margin">Username: <input id="usernameInput" type="text" name="username" placeholder="Enter Username">
             </div>
             <textarea placeholder="Enter something funny." id="myTextarea" name="myTextarea" rows="4"></textarea>
             <br>
@@ -107,53 +107,49 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const paperForm = document.getElementById('paper');
-            paperForm.addEventListener('submit', handleSubmit);
             loadSaves();
         });
 
-        function handleSubmit(event) {
+        function handleSubmit() {
             event.preventDefault();
             const text = document.getElementById("myTextarea").value;
-            const title = document.getElementById("titleInput").value;
+            const username = document.getElementById("usernameInput").value;
             const timestamp = new Date().toLocaleString();
 
-            if (text === "" || title === "") {
-                alert("Please enter both title and text before saving.");
-                return;
+            if (text === "" || username === "") {
+                alert("Please enter both username and text before saving.");
+                return false;
             }
 
-            if (typeof (Storage) !== "undefined") {
-                const saves = JSON.parse(localStorage.getItem("saves")) || [];
+            // Save to localStorage (for demonstration purposes)
+            const saves = JSON.parse(localStorage.getItem("saves")) || [];
+            saves.push({
+                timestamp: timestamp,
+                username: username,
+                text: text,
+            });
+            localStorage.setItem("saves", JSON.stringify(saves));
 
-                saves.push({
-                    timestamp: timestamp,
-                    title: title,
-                    text: text,
-                });
+            // Display the save
+            displaySave({
+                timestamp: timestamp,
+                username: username,
+                text: text,
+            });
 
-                localStorage.setItem("saves", JSON.stringify(saves));
-
-                displaySave({
-                    timestamp: timestamp,
-                    title: title,
-                    text: text,
-                });
-            } else {
-                alert("Sorry, your browser does not support web storage...");
-            }
+            // Clear the form
+            document.getElementById("myTextarea").value = "";
+            return false;
         }
 
         function loadSaves() {
-            if (localStorage.getItem("saves")) {
-                const saves = JSON.parse(localStorage.getItem("saves"));
+            const savesContainer = document.getElementById('hiddenSaves');
+            savesContainer.innerHTML = "";
 
-                saves.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-                saves.forEach(function (save) {
-                    displaySave(save);
-                });
-            }
+            const saves = JSON.parse(localStorage.getItem("saves")) || [];
+            saves.forEach(function (save) {
+                displaySave(save);
+            });
         }
 
         function displaySave(save) {
@@ -161,12 +157,12 @@
             const saveDiv = document.createElement('div');
             saveDiv.classList.add('save');
 
-            // Create elements for timestamp, title, text, and delete button
+            // Create elements for timestamp, username, text, and delete button
             const timestampPara = document.createElement('h1');
             timestampPara.textContent = "Timestamp: " + save.timestamp;
 
-            const titlePara = document.createElement('p');
-            titlePara.textContent = "Title: " + save.title;
+            const usernamePara = document.createElement('p');
+            usernamePara.textContent = "Username: " + save.username;
 
             const textPara = document.createElement('p');
             textPara.textContent = "Text: " + save.text;
@@ -181,7 +177,7 @@
 
             // Append elements to the save div
             saveDiv.appendChild(timestampPara);
-            saveDiv.appendChild(titlePara);
+            saveDiv.appendChild(usernamePara);
             saveDiv.appendChild(textPara);
             saveDiv.appendChild(deleteButton);
 
@@ -193,20 +189,11 @@
         }
 
         function removeSave(save) {
-            if (localStorage.getItem("saves")) {
-                const saves = JSON.parse(localStorage.getItem("saves"));
-
-                // Find the index of the save to be removed
-                const index = saves.findIndex(function (item) {
-                    return item.timestamp === save.timestamp && item.text === save.text;
-                });
-
-                if (index !== -1) {
-                    // Remove the save from the array
-                    saves.splice(index, 1);
-                    // Update local storage
-                    localStorage.setItem("saves", JSON.stringify(saves));
-                }
+            const saves = JSON.parse(localStorage.getItem("saves")) || [];
+            const index = saves.findIndex(s => s.timestamp === save.timestamp && s.username === save.username);
+            if (index !== -1) {
+                saves.splice(index, 1);
+                localStorage.setItem("saves", JSON.stringify(saves));
             }
         }
     </script>
