@@ -97,10 +97,21 @@
       if (username !== '' && message !== '') {
         addMessage(username, message);
         inputMessage.value = '';
+
+        // Store the message in local storage
+        const storedMessages = JSON.parse(localStorage.getItem('chatMessages')) || [];
+        storedMessages.push({ username, message });
+        localStorage.setItem('chatMessages', JSON.stringify(storedMessages));
       }
     };
 
     sendMessageBtn.addEventListener('click', sendMessage);
+
+    // Retrieve and display existing messages from local storage
+    const storedMessages = JSON.parse(localStorage.getItem('chatMessages')) || [];
+    storedMessages.forEach(({ username, message }) => {
+      addMessage(username, message);
+    });
 
     // Optional: send message on pressing Enter key
     inputMessage.addEventListener('keyup', (event) => {
